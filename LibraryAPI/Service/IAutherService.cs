@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Identity.Data;
 
 namespace LibraryAPI.Service
 {
-    public interface IUserService
+    public interface IAutherService
     {
         Task<UserResponse> LoginAsync(DTOs.LoginRequest request);
-        Task<bool> RegisterAsync(RegisterRequest request);
+        Task<bool> RegisterAsync(DTOs.RegisterRequest request);
     }
 }
