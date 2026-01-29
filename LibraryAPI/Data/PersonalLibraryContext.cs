@@ -39,7 +39,7 @@ public partial class PersonalLibraryContext : DbContext
         optionsBuilder.EnableDetailedErrors()
             .EnableSensitiveDataLogging();
         {
-            var connectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetConnectionString("MyCnn");
+            var connectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetConnectionString("DefaultConnection");
             optionsBuilder.UseSqlServer(connectionString);
         }
 

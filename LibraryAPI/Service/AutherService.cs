@@ -12,7 +12,7 @@ namespace LibraryAPI.Service
 {
     // Lưu ý: Đảm bảo Interface của bạn tên là IAuthService (như đã hướng dẫn đổi tên ở bước trước)
     // Nếu chưa đổi tên file Interface, hãy sửa IAuthService thành IAutherService
-    public class AutherService : IAuthService
+    public class AutherService : IAutherService
     {
         private readonly PersonalLibraryContext _context;
         private readonly IConfiguration _configuration;

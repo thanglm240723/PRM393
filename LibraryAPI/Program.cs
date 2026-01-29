@@ -40,7 +40,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddControllers();
 
 // Đăng ký AutoMapper (quét toàn bộ project để tìm các class kế thừa Profile)
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 builder.Services.AddEndpointsApiExplorer();
 
