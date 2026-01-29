@@ -20,6 +20,8 @@ namespace LibraryAPI.mapper
                 .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.username, opt => opt.MapFrom(src => src.Username))
                 .ForMember(dest => dest.email, opt => opt.MapFrom(src => src.Email));
+
+            CreateMap<Book, BookResponse>();
         }
     }
 }

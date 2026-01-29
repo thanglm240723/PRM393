@@ -1,7 +1,7 @@
 ﻿using LibraryAPI.DTOs;
 using Microsoft.AspNetCore.Identity.Data;
 
-namespace LibraryAPI.Service
+namespace LibraryAPI.Service.Interface
 {
     public interface IAutherService
     {

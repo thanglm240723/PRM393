@@ -1,5 +1,6 @@
 ﻿using LibraryAPI.Data;
 using LibraryAPI.Service;
+using LibraryAPI.Service.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -13,7 +14,7 @@ builder.Services.AddDbContext<PersonalLibraryContext>(options =>
 
 // 2. Đăng ký Service của bạn
 builder.Services.AddScoped<IAutherService, AutherService>();
-
+builder.Services.AddScoped<IBookService, BookService>();
 
 
 

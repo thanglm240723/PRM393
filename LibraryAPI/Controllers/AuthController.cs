@@ -1,5 +1,5 @@
 ﻿using LibraryAPI.DTOs;
-using LibraryAPI.Service;
+using LibraryAPI.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryAPI.Controllers

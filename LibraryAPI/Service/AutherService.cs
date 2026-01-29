@@ -2,6 +2,7 @@
 using LibraryAPI.Data;
 using LibraryAPI.Data.Models;
 using LibraryAPI.DTOs;
+using LibraryAPI.Service.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
