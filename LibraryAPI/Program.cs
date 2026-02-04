@@ -17,6 +17,16 @@ builder.Services.AddScoped<IAutherService, AutherService>();
 builder.Services.AddScoped<IBookService, BookService>();
 
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()   // Cho phép tất cả nguồn (Flutter Web, Mobile...)
+                   .AllowAnyMethod()   // Cho phép GET, POST, PUT, DELETE...
+                   .AllowAnyHeader();  // Cho phép mọi Header
+        });
+});
 
 // 3. Cấu hình Authentication & JWT
 builder.Services.AddAuthentication(options =>
@@ -83,6 +93,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowAll");
 // QUAN TRỌNG: Thứ tự middleware
 app.UseAuthentication(); // Phải đặt trước UseAuthorization
 app.UseAuthorization();

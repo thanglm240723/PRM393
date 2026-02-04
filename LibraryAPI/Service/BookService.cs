@@ -47,5 +47,43 @@ namespace LibraryAPI.Service
 
 
         }
+
+        public async Task<PagedResult<BookResponse>> SearchBooksAsync(BookSearchRequest request)
+        {
+            var query = _context.Books.AsQueryable();
+
+            if (!string.IsNullOrEmpty(request.SearchTerm))
+            {
+                // Tìm kiếm theo Title hoặc Author
+                var tearm = request.SearchTerm.Trim().ToLower();
+                query = query.Where(b => b.Title.Contains(tearm) || b.Author.Contains(tearm));
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Genre))
+            {
+                // Tìm kiếm theo Genre( thể loại)
+                var term = request.Genre.Trim().ToLower();
+                query = query.Where(b => b.Genre.ToLower().Contains(term));
+            }
+
+
+            var totalCount = await query.CountAsync();
+            var books = await query
+                .OrderByDescending( b => b.CreatedAt)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            var bookDtos = _mapper.Map<List<BookResponse>>(books);
+
+            return new PagedResult<BookResponse>
+            {
+                Items = bookDtos,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
+
+        }
     }
 }
