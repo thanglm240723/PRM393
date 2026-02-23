@@ -6,6 +6,9 @@ namespace LibraryAPI.Service.Interface
     {
         Task<PagedResult<BookResponse>> GetBooksAsync(int pageNumber, int pageSize);
         Task<PagedResult<BookResponse>> SearchBooksAsync(BookSearchRequest request);
-
+        Task<BookDetailResponse?> GetBookByIdAsync(int bookId);
+        Task<List<ChapterListItem>> GetChapterListAsync(int bookId);
+        Task<ChapterResponse?> GetChapterAsync(int bookId, int chapterNumber);
     }
 }
+     
