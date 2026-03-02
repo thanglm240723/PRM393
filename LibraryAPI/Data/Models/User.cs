@@ -16,6 +16,7 @@ public partial class User
     public string? FullName { get; set; }
 
     public string? AvatarUrl { get; set; }
+    public string Role { get; set; } = "user";
 
     public DateTime? CreatedAt { get; set; }
 

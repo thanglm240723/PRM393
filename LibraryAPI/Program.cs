@@ -1,4 +1,6 @@
 ﻿using LibraryAPI.Data;
+using LibraryAPI.Data.Models;
+using LibraryAPI.Data.Seeder;
 using LibraryAPI.Service;
 using LibraryAPI.Service.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,6 +18,7 @@ builder.Services.AddDbContext<PersonalLibraryContext>(options =>
 builder.Services.AddScoped<IAutherService, AutherService>();
 builder.Services.AddScoped<IBookService, BookService>();
 
+  
 
 builder.Services.AddCors(options =>
 {
@@ -84,6 +87,13 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<PersonalLibraryContext>();
+    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    await DatabaseSeeder.SeedAsync(context, config);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -101,3 +111,28 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static async Task SeedAdminAsync(PersonalLibraryContext context, IConfiguration config)
+{
+    var adminConfig = config.GetSection("AdminAccount");
+    var adminUsername = adminConfig["Username"]!;
+
+    // Nếu admin đã tồn tại thì bỏ qua
+    if (await context.Users.AnyAsync(u => u.Username == adminUsername))
+        return;
+
+    var adminUser = new User
+    {
+        Username = adminUsername,
+        Email = adminConfig["Email"]!,
+        FullName = adminConfig["FullName"]!,
+        PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminConfig["Password"]!),
+        Role = "admin",         // thêm field Role vào User model
+        CreatedAt = DateTime.Now,
+        UpdatedAt = DateTime.Now
+    };
+
+    context.Users.Add(adminUser);
+    await context.SaveChangesAsync();
+    Console.WriteLine("✅ Admin account seeded successfully.");
+}

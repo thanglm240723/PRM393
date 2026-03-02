@@ -13,9 +13,12 @@ namespace LibraryAPI.Controllers
         private readonly IBookService _bookService;
         public BooksController(IBookService bookService) => _bookService = bookService;
 
+        // ── Public endpoints (không cần login) ───────────────────────
+
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetBooks([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetBooks(
+            [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
             => Ok(await _bookService.GetBooksAsync(page, pageSize));
 
         [HttpGet("search")]
@@ -31,19 +34,25 @@ namespace LibraryAPI.Controllers
             return result == null ? NotFound() : Ok(result);
         }
 
-        // GET: api/Books/5/chapters — danh sách chương
+        // Danh sách chương: public (để hiện số chương trên màn detail)
         [HttpGet("{id}/chapters")]
         [AllowAnonymous]
         public async Task<IActionResult> GetChapters(int id)
             => Ok(await _bookService.GetChapterListAsync(id));
 
-        // GET: api/Books/5/chapters/1 — nội dung chương 1
+        // ── Nội dung chương: YÊU CẦU ĐĂNG NHẬP ─────────────────────
         [HttpGet("{id}/chapters/{chapterNumber}")]
-        [AllowAnonymous]
+        [Authorize]  // ← chặn người chưa login
         public async Task<IActionResult> GetChapter(int id, int chapterNumber)
         {
             var result = await _bookService.GetChapterAsync(id, chapterNumber);
-            return result == null ? NotFound() : Ok(result);
+
+            // Trả về null-safe: nếu chương không tồn tại → 204 NoContent
+            // Flutter sẽ xử lý 204 như "hết chương" thay vì lỗi
+            if (result == null)
+                return NoContent(); // 204 — hết chương, không có lỗi
+
+            return Ok(result);
         }
     }
 }

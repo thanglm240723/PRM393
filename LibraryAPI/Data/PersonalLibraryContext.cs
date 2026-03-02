@@ -33,17 +33,7 @@ public partial class PersonalLibraryContext : DbContext
     public virtual DbSet<UserLibrary> UserLibraries { get; set; }
 
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-        optionsBuilder.EnableDetailedErrors()
-            .EnableSensitiveDataLogging();
-        {
-            var connectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetConnectionString("DefaultConnection");
-            optionsBuilder.UseSqlServer(connectionString);
-        }
-
-    }
+ 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Book>(entity =>
