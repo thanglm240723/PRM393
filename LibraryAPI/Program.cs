@@ -17,8 +17,8 @@ builder.Services.AddDbContext<PersonalLibraryContext>(options =>
 // 2. Đăng ký Service của bạn
 builder.Services.AddScoped<IAutherService, AutherService>();
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IReadingProgressService, ReadingProgressService>(); 
 
-  
 
 builder.Services.AddCors(options =>
 {
@@ -63,12 +63,14 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
-        Description = "Nhập token theo định dạng: Bearer {token}",
         Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,   // ⚠ Đổi sang Http
+        Scheme = "bearer",                                         // ⚠ phải là lowercase
+        BearerFormat = "JWT",
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Description = "Nhập token"
     });
+
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
         {

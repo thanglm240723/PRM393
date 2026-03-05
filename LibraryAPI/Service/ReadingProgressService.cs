@@ -1,7 +1,7 @@
 ﻿using LibraryAPI.Data;
 using LibraryAPI.Data.Models;
 using LibraryAPI.DTOs;
-using LibraryAPI.Service.Interface.LibraryAPI.Service.Interface;
+using LibraryAPI.Service.Interface;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryAPI.Service
