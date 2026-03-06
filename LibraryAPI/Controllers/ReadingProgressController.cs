@@ -25,7 +25,7 @@ namespace LibraryAPI.Controllers
             _context = context;
         }
 
-        // ── Lấy tiến trình đọc theo bookId ──────────────────────────
+   
         [HttpGet("{bookId}")]
         public async Task<IActionResult> GetProgress(int bookId)
         {
@@ -37,7 +37,7 @@ namespace LibraryAPI.Controllers
 
             if (result == null)
             {
-                // Chưa có tiến trình → trả về mặc định
+              
                 return Ok(new
                 {
                     currentChapter = 1,
@@ -54,7 +54,7 @@ namespace LibraryAPI.Controllers
             });
         }
 
-        // ── Lưu tiến trình đọc ──────────────────────────────────────
+       
         [HttpPost]
         public async Task<IActionResult> SaveProgress([FromBody] SaveProgressRequest dto)
         {
@@ -69,7 +69,6 @@ namespace LibraryAPI.Controllers
             return Ok(result);
         }
 
-        // ── Lấy tất cả tiến trình của user ──────────────────────────
         [HttpGet]
         public async Task<IActionResult> GetAllProgress()
         {

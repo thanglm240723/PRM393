@@ -95,7 +95,7 @@
                 PublishedYear = 1936,
                 Rating        = 4.8m,
                 Language      = "Vietnamese",
-                CoverImageUrl = "https://salt.tikicdn.com/cache/w1200/ts/product/5e/18/24/2a6154ba08df6ce6c6a7e6aa5c02b08e.jpg",
+                CoverImageUrl = "https://cdn1.fahasa.com/media/catalog/product/9/7/9786043949247.jpg",
                 CreatedAt     = DateTime.Now,
             },
             new()
@@ -110,7 +110,7 @@
                 PublishedYear = 1988,
                 Rating        = 4.7m,
                 Language      = "Vietnamese",
-                CoverImageUrl = "https://salt.tikicdn.com/cache/w1200/ts/product/45/ee/f9/6c0f49ce3afabda1dc79df7c9b6823ad.jpg",
+                CoverImageUrl = "https://cdn1.fahasa.com/media/catalog/product/i/m/image_195509_1_36793_1.jpg",
                 CreatedAt     = DateTime.Now,
             },
             new()
@@ -124,7 +124,7 @@
                 PublishedYear = 2011,
                 Rating        = 4.6m,
                 Language      = "Vietnamese",
-                CoverImageUrl = "https://salt.tikicdn.com/cache/w1200/ts/product/5f/a1/4e/c59c6f0532e6b1413ec63dccdc7f32e4.jpg",
+                CoverImageUrl = "https://cdn1.fahasa.com/media/flashmagazine/images/page_images/tu_duy_nhanh_va_cham_tai_ban_2021/2021_06_23_08_21_26_1-390x510.jpg",
                 CreatedAt     = DateTime.Now,
             },
             new()
@@ -138,7 +138,7 @@
                 PublishedYear = 2011,
                 Rating        = 4.9m,
                 Language      = "Vietnamese",
-                CoverImageUrl = "https://salt.tikicdn.com/cache/w1200/ts/product/9b/86/b7/7f2de31e4ee5303e6a0ea29fc1b75cd0.jpg",
+                CoverImageUrl = "https://cdn1.fahasa.com/media/flashmagazine/images/page_images/sapiens_luoc_su_loai_nguoi/2023_03_21_16_35_44_1-390x510.jpg",
                 CreatedAt     = DateTime.Now,
             },
             new()
@@ -152,7 +152,7 @@
                 PublishedYear = 2013,
                 Rating        = 4.5m,
                 Language      = "Vietnamese",
-                CoverImageUrl = "https://salt.tikicdn.com/cache/w1200/ts/product/2f/b2/ab/1c5f9e6b5a7aa8e21c0ac9e49d2c1ee2.jpg",
+                CoverImageUrl = "https://cdn1.fahasa.com/media/catalog/product/8/9/8935235215283_1.jpg",
                 CreatedAt     = DateTime.Now,
             },
             new()
@@ -166,7 +166,7 @@
                 PublishedYear = 1969,
                 Rating        = 4.8m,
                 Language      = "Vietnamese",
-                CoverImageUrl = "https://salt.tikicdn.com/cache/w1200/ts/product/6a/27/59/0d4a4a9e6f9b7a3b5e8c2d1f0e7a6b9c.jpg",
+                CoverImageUrl = "https://cdn1.fahasa.com/media/catalog/product/0/0/00_2.jpg",
                 CreatedAt     = DateTime.Now,
             },
         };
