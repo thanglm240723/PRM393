@@ -19,7 +19,7 @@ builder.Services.AddScoped<IAutherService, AutherService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IReadingProgressService, ReadingProgressService>();
 builder.Services.AddScoped<IAdminBookService, AdminBookService>();
-
+builder.Services.AddScoped<IUserLibraryService, UserLibraryService>();
 
 builder.Services.AddCors(options =>
 {
