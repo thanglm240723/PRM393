@@ -15,6 +15,51 @@
             _context = context;
         }
 
+        public async Task<PagedResult<BookResponse>> GetBooksAsync(int page = 1, int pageSize = 20, string? searchTerm = null)
+        {
+            var query = _context.Books.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var search = searchTerm.ToLower();
+                query = query.Where(b => 
+                    b.Title.ToLower().Contains(search) || 
+                    b.Author.ToLower().Contains(search) ||
+                    b.Genre.ToLower().Contains(search));
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var books = await query
+                .OrderByDescending(b => b.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(b => new BookResponse
+                {
+                    BookId = b.BookId,
+                    Title = b.Title,
+                    Author = b.Author,
+                    Description = b.Description,
+                    CoverImageUrl = b.CoverImageUrl,
+                    Genre = b.Genre,
+                    PageCount = b.PageCount,
+                    PublishedYear = b.PublishedYear,
+                    Rating = b.Rating,
+                    Language = b.Language,
+                    FileUrl = b.FileUrl,
+                    TotalChapters = _context.BookContents.Count(c => c.BookId == b.BookId),
+                    CreatedAt = b.CreatedAt,
+                })
+                .ToListAsync();
+
+            return new PagedResult<BookResponse>
+            {
+                Items = books,
+                TotalCount = totalCount,
+                PageNumber = page,
+                PageSize = pageSize,
+            };
+        }
    
         public async Task<CreateBookResponse> CreateBookAsync(CreateBookRequest request)
         {

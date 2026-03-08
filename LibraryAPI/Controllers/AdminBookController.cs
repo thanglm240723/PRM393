@@ -47,7 +47,13 @@ namespace LibraryAPI.Controllers
         }
 
 
-        [HttpGet("{bookId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetBooks([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string? searchTerm = null)
+        {
+            var books = await _adminBookService.GetBooksAsync(page, pageSize, searchTerm);
+            return Ok(books);
+        }
+
         public async Task<IActionResult> GetBook(int bookId)
         {
             var book = await _adminBookService.GetBookByIdAsync(bookId);
