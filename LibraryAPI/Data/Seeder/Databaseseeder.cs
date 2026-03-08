@@ -43,7 +43,7 @@
                 FullName     = adminCfg["FullName"] ?? "Administrator",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(
                                    adminCfg["Password"] ?? "Admin@123"),
-                Role      = "user",
+                Role      = "admin",
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
             },
