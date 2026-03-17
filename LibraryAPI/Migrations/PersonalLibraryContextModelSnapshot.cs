@@ -22,6 +22,48 @@ namespace LibraryAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("LibraryAPI.Data.Models.Badge", b =>
+                {
+                    b.Property<int>("BadgeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BadgeId"));
+
+                    b.Property<string>("ConditionType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("DisplayOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasDefaultValue("🏅");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Threshold")
+                        .HasColumnType("int");
+
+                    b.HasKey("BadgeId");
+
+                    b.ToTable("Badges");
+                });
+
             modelBuilder.Entity("LibraryAPI.Data.Models.Book", b =>
                 {
                     b.Property<int>("BookId")
@@ -121,6 +163,59 @@ namespace LibraryAPI.Migrations
                     b.ToTable("BookContents");
                 });
 
+            modelBuilder.Entity("LibraryAPI.Data.Models.BookRating", b =>
+                {
+                    b.Property<int>("RatingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RatingId"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BookId1")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<bool>("IsVerifiedReader")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Review")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("Stars")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RatingId");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("BookId1");
+
+                    b.HasIndex("UserId", "BookId")
+                        .IsUnique()
+                        .HasDatabaseName("UQ_BookRating_UserId_BookId");
+
+                    b.ToTable("BookRatings", t =>
+                        {
+                            t.HasCheckConstraint("CK_BookRating_Stars", "[Stars] >= 1 AND [Stars] <= 5");
+                        });
+                });
+
             modelBuilder.Entity("LibraryAPI.Data.Models.Bookmark", b =>
                 {
                     b.Property<int>("BookmarkId")
@@ -215,6 +310,62 @@ namespace LibraryAPI.Migrations
                     b.HasIndex(new[] { "UserId", "BookId" }, "IX_Highlights_UserId_BookId");
 
                     b.ToTable("Highlights");
+                });
+
+            modelBuilder.Entity("LibraryAPI.Data.Models.Quote", b =>
+                {
+                    b.Property<int>("QuoteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuoteId"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ContentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<int?>("EndPosition")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsPublic")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("PersonalNote")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("QuoteText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("StartPosition")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("QuoteId");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("ContentId");
+
+                    b.HasIndex("IsPublic")
+                        .HasDatabaseName("IX_Quotes_IsPublic");
+
+                    b.HasIndex("UserId", "BookId")
+                        .HasDatabaseName("IX_Quotes_UserId_BookId");
+
+                    b.ToTable("Quotes");
                 });
 
             modelBuilder.Entity("LibraryAPI.Data.Models.ReadingHistory", b =>
@@ -335,7 +486,10 @@ namespace LibraryAPI.Migrations
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("user");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .ValueGeneratedOnAdd()
@@ -359,6 +513,36 @@ namespace LibraryAPI.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("LibraryAPI.Data.Models.UserBadge", b =>
+                {
+                    b.Property<int>("UserBadgeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserBadgeId"));
+
+                    b.Property<int>("BadgeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EarnedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserBadgeId");
+
+                    b.HasIndex("BadgeId");
+
+                    b.HasIndex("UserId", "BadgeId")
+                        .IsUnique()
+                        .HasDatabaseName("UQ_UserBadge_UserId_BadgeId");
+
+                    b.ToTable("UserBadges");
+                });
+
             modelBuilder.Entity("LibraryAPI.Data.Models.UserLibrary", b =>
                 {
                     b.Property<int>("UserLibraryId")
@@ -374,6 +558,14 @@ namespace LibraryAPI.Migrations
 
                     b.Property<int?>("BookId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<bool>("IsCountedAsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<bool?>("IsFavorite")
                         .ValueGeneratedOnAdd()
@@ -403,6 +595,80 @@ namespace LibraryAPI.Migrations
                     b.ToTable("UserLibrary", (string)null);
                 });
 
+            modelBuilder.Entity("LibraryAPI.Data.Models.UserStats", b =>
+                {
+                    b.Property<int>("UserStatsId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserStatsId"));
+
+                    b.Property<int>("CurrentStreak")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("FavoriteGenre")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("LastReadDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("LongestStreak")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("Rank")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("Mầm Đọc");
+
+                    b.Property<int>("TotalBooksRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("TotalBooksStarted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("TotalMinutesRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("TotalPagesRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("TotalWordsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserStatsId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasDatabaseName("UQ_UserStats_UserId");
+
+                    b.ToTable("UserStats");
+                });
+
             modelBuilder.Entity("LibraryAPI.Data.Models.BookContent", b =>
                 {
                     b.HasOne("LibraryAPI.Data.Models.Book", "Book")
@@ -412,6 +678,29 @@ namespace LibraryAPI.Migrations
                         .HasConstraintName("FK__BookConte__BookI__4222D4EF");
 
                     b.Navigation("Book");
+                });
+
+            modelBuilder.Entity("LibraryAPI.Data.Models.BookRating", b =>
+                {
+                    b.HasOne("LibraryAPI.Data.Models.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LibraryAPI.Data.Models.Book", null)
+                        .WithMany("BookRatings")
+                        .HasForeignKey("BookId1");
+
+                    b.HasOne("LibraryAPI.Data.Models.User", "User")
+                        .WithMany("BookRatings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LibraryAPI.Data.Models.Bookmark", b =>
@@ -466,6 +755,32 @@ namespace LibraryAPI.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("LibraryAPI.Data.Models.Quote", b =>
+                {
+                    b.HasOne("LibraryAPI.Data.Models.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("LibraryAPI.Data.Models.BookContent", "Content")
+                        .WithMany()
+                        .HasForeignKey("ContentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("LibraryAPI.Data.Models.User", "User")
+                        .WithMany("Quotes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Content");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LibraryAPI.Data.Models.ReadingHistory", b =>
                 {
                     b.HasOne("LibraryAPI.Data.Models.Book", "Book")
@@ -511,6 +826,25 @@ namespace LibraryAPI.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("LibraryAPI.Data.Models.UserBadge", b =>
+                {
+                    b.HasOne("LibraryAPI.Data.Models.Badge", "Badge")
+                        .WithMany("UserBadges")
+                        .HasForeignKey("BadgeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LibraryAPI.Data.Models.User", "User")
+                        .WithMany("UserBadges")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Badge");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LibraryAPI.Data.Models.UserLibrary", b =>
                 {
                     b.HasOne("LibraryAPI.Data.Models.Book", "Book")
@@ -530,9 +864,27 @@ namespace LibraryAPI.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("LibraryAPI.Data.Models.UserStats", b =>
+                {
+                    b.HasOne("LibraryAPI.Data.Models.User", "User")
+                        .WithOne("Stats")
+                        .HasForeignKey("LibraryAPI.Data.Models.UserStats", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LibraryAPI.Data.Models.Badge", b =>
+                {
+                    b.Navigation("UserBadges");
+                });
+
             modelBuilder.Entity("LibraryAPI.Data.Models.Book", b =>
                 {
                     b.Navigation("BookContents");
+
+                    b.Navigation("BookRatings");
 
                     b.Navigation("Bookmarks");
 
@@ -556,13 +908,21 @@ namespace LibraryAPI.Migrations
 
             modelBuilder.Entity("LibraryAPI.Data.Models.User", b =>
                 {
+                    b.Navigation("BookRatings");
+
                     b.Navigation("Bookmarks");
 
                     b.Navigation("Highlights");
 
+                    b.Navigation("Quotes");
+
                     b.Navigation("ReadingHistories");
 
                     b.Navigation("ReadingProgresses");
+
+                    b.Navigation("Stats");
+
+                    b.Navigation("UserBadges");
 
                     b.Navigation("UserLibraries");
                 });

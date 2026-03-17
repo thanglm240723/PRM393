@@ -17,9 +17,16 @@ builder.Services.AddDbContext<PersonalLibraryContext>(options =>
 
 builder.Services.AddScoped<IAutherService, AutherService>();
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IGamificationService, GamificationService>();
 builder.Services.AddScoped<IReadingProgressService, ReadingProgressService>();
 builder.Services.AddScoped<IAdminBookService, AdminBookService>();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IAutherService, AutherService>();
 builder.Services.AddScoped<IUserLibraryService, UserLibraryService>();
+builder.Services.AddScoped<IAdminBookService, AdminBookService>();
+builder.Services.AddScoped<IUserLibraryService, UserLibraryService>();
+builder.Services.AddScoped<IQuoteService,       QuoteService>();
+builder.Services.AddScoped<IBookRatingService,  BookRatingService>();
 
 builder.Services.AddCors(options =>
 {

@@ -1,11 +1,11 @@
-﻿namespace LibraryAPI.Service
-{
-    using LibraryAPI.Data;
-    using LibraryAPI.Data.Models;
-    using LibraryAPI.DTOs;
-    using LibraryAPI.Service.Interface;
-    using Microsoft.EntityFrameworkCore;
+﻿using LibraryAPI.Data;
+using LibraryAPI.Data.Models;
+using LibraryAPI.DTOs;
+using LibraryAPI.Service.Interface;
+using Microsoft.EntityFrameworkCore;
 
+namespace LibraryAPI.Service
+{
     public class AdminBookService : IAdminBookService
     {
         private readonly PersonalLibraryContext _context;
@@ -15,17 +15,20 @@
             _context = context;
         }
 
-        public async Task<PagedResult<BookResponse>> GetBooksAsync(int page = 1, int pageSize = 20, string? searchTerm = null)
+        public async Task<PagedResult<BookResponse>> GetBooksAsync(
+            int page = 1, int pageSize = 20, string? searchTerm = null)
         {
             var query = _context.Books.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                var search = searchTerm.ToLower();
-                query = query.Where(b => 
-                    b.Title.ToLower().Contains(search) || 
-                    b.Author.ToLower().Contains(search) ||
-                    b.Genre.ToLower().Contains(search));
+                var s = searchTerm.Trim().ToLower();
+
+                // ── FIX: Genre có thể null → crash khi .ToLower() ─────
+                query = query.Where(b =>
+                    b.Title.ToLower().Contains(s) ||
+                    b.Author.ToLower().Contains(s) ||
+                    (b.Genre != null && b.Genre.ToLower().Contains(s)));
             }
 
             var totalCount = await query.CountAsync();
@@ -60,10 +63,9 @@
                 PageSize = pageSize,
             };
         }
-   
+
         public async Task<CreateBookResponse> CreateBookAsync(CreateBookRequest request)
         {
-          
             var book = new Book
             {
                 Title = request.Title.Trim(),
@@ -74,20 +76,18 @@
                 PageCount = request.PageCount,
                 PublishedYear = request.PublishedYear,
                 Rating = request.Rating,
-                Language = request.Language?.Trim() ?? "Tiếng Việt",
+                Language = request.Language?.Trim() ?? "Vietnamese",
                 FileUrl = request.FileUrl?.Trim(),
                 CreatedAt = DateTime.Now,
             };
 
             _context.Books.Add(book);
-            await _context.SaveChangesAsync(); 
+            await _context.SaveChangesAsync();
 
             int chaptersAdded = 0;
 
-           
             if (request.Chapters != null && request.Chapters.Any())
             {
-             
                 var chapterNumbers = request.Chapters.Select(c => c.ChapterNumber).ToList();
                 if (chapterNumbers.Distinct().Count() != chapterNumbers.Count)
                     throw new InvalidOperationException("Số chương bị trùng lặp.");
@@ -123,10 +123,9 @@
             };
         }
 
-        
         public async Task<BookResponse?> GetBookByIdAsync(int bookId)
         {
-            var book = await _context.Books
+            return await _context.Books
                 .Where(b => b.BookId == bookId)
                 .Select(b => new BookResponse
                 {
@@ -145,17 +144,13 @@
                     CreatedAt = b.CreatedAt,
                 })
                 .FirstOrDefaultAsync();
-
-            return book;
         }
 
-     
         public async Task<BookResponse?> UpdateBookAsync(int bookId, UpdateBookRequest request)
         {
             var book = await _context.Books.FindAsync(bookId);
             if (book == null) return null;
 
-          
             if (request.Title != null) book.Title = request.Title.Trim();
             if (request.Author != null) book.Author = request.Author.Trim();
             if (request.Description != null) book.Description = request.Description.Trim();
@@ -168,17 +163,16 @@
             if (request.FileUrl != null) book.FileUrl = request.FileUrl.Trim();
 
             await _context.SaveChangesAsync();
-
             return await GetBookByIdAsync(bookId);
         }
 
-     
         public async Task<bool> DeleteBookAsync(int bookId)
         {
             var book = await _context.Books.FindAsync(bookId);
             if (book == null) return false;
 
-          
+            // BookContents có Cascade Delete nên không cần xoá thủ công
+            // nhưng để tường minh vẫn xoá trước
             var chapters = await _context.BookContents
                 .Where(c => c.BookId == bookId)
                 .ToListAsync();
@@ -189,20 +183,18 @@
             return true;
         }
 
-      
         public async Task<bool> BookExistsAsync(string title, string author)
         {
-            return await _context.Books
-                .AnyAsync(b =>
-                    b.Title.ToLower() == title.Trim().ToLower() &&
-                    b.Author.ToLower() == author.Trim().ToLower());
+            return await _context.Books.AnyAsync(b =>
+                b.Title.ToLower() == title.Trim().ToLower() &&
+                b.Author.ToLower() == author.Trim().ToLower());
         }
 
-       
         private static int CountWords(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return 0;
-            return text.Split(new[] { ' ', '\n', '\r', '\t' },
+            return text.Split(
+                new[] { ' ', '\n', '\r', '\t' },
                 StringSplitOptions.RemoveEmptyEntries).Length;
         }
     }
