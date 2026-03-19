@@ -1,4 +1,4 @@
-﻿using LibraryAPI.Data;
+using LibraryAPI.Data;
 using LibraryAPI.Data.Models;
 using LibraryAPI.Data.Seeder;
 using LibraryAPI.Service;
@@ -24,6 +24,7 @@ builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IAutherService, AutherService>();
 builder.Services.AddScoped<IUserLibraryService, UserLibraryService>();
 builder.Services.AddScoped<IAdminBookService, AdminBookService>();
+builder.Services.AddScoped<IAdminUserService, AdminUserService>();
 builder.Services.AddScoped<IUserLibraryService, UserLibraryService>();
 builder.Services.AddScoped<IQuoteService,       QuoteService>();
 builder.Services.AddScoped<IBookRatingService,  BookRatingService>();
