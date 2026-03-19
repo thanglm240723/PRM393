@@ -1,4 +1,5 @@
 ﻿using LibraryAPI.DTOs;
+using LibraryAPI.Service;
 using LibraryAPI.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -92,6 +93,32 @@ namespace LibraryAPI.Controllers
         {
             var str = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return int.TryParse(str, out var id) ? id : null;
+        }
+
+        [HttpGet("history")]
+        [Authorize]
+        public async Task<IActionResult> GetHistory()
+        {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized("Không tìm thấy thông tin người dùng.");
+
+            var userId = int.Parse(userIdClaim);
+            var history = await _progressService.GetReadingHistoryAsync(userId);
+            return Ok(history);
+        }
+
+        [HttpGet("bookmarks")]
+        [Authorize]
+        public async Task<IActionResult> GetBookmarks()
+        {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized("Không tìm thấy thông tin người dùng.");
+
+            var userId = int.Parse(userIdClaim);
+            var bookmarks = await _progressService.GetBookmarksAsync(userId);
+            return Ok(bookmarks);
         }
     }
 }

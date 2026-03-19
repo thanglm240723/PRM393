@@ -1,4 +1,5 @@
-﻿using LibraryAPI.DTOs;
+﻿using LibraryAPI.Data.Models;
+using LibraryAPI.DTOs;
 
 namespace LibraryAPI.Service.Interface
 {
@@ -10,5 +11,8 @@ namespace LibraryAPI.Service.Interface
         Task<ReadingProgressResponse> SaveProgressAsync(int userId, SaveProgressRequest request);
 
         Task<List<ReadingProgressResponse>> GetAllProgressAsync(int userId);
+
+        Task<List<ReadingHistoryDto>> GetReadingHistoryAsync(int userId);
+        Task<List<BookmarkDto>> GetBookmarksAsync(int userId);
     }
 }
