@@ -1,4 +1,5 @@
-﻿// Service/GamificationService.cs
+﻿
+// Service/GamificationService.cs
 // FIX: TotalPagesRead tính theo % đọc thực tế, không cộng toàn bộ pageCount
 
 using LibraryAPI.Data;

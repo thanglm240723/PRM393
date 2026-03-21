@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using LibraryAPI.Data;
 using LibraryAPI.Data.Models;
 using LibraryAPI.DTOs;
@@ -78,6 +78,8 @@ namespace LibraryAPI.Service
 
             return true;
         }
+
+
 
         private string GenerateJwtToken(User user)
         {
