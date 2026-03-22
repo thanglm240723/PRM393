@@ -1,4 +1,4 @@
-﻿// ── DTOs/ReadingProgressDto.cs ────────────────────────────────────────
+﻿
 namespace LibraryAPI.DTOs
 {
     public class ReadingProgressResponse

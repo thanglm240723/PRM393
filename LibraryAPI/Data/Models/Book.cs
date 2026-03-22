@@ -40,4 +40,5 @@ public partial class Book
     public virtual ICollection<ReadingProgress> ReadingProgresses { get; set; } = new List<ReadingProgress>();
 
     public virtual ICollection<UserLibrary> UserLibraries { get; set; } = new List<UserLibrary>();
+    public virtual ICollection<BookRating> BookRatings { get; set; } = new List<BookRating>();
 }

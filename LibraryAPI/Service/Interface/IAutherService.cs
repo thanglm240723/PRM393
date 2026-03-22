@@ -1,11 +1,11 @@
-﻿using LibraryAPI.DTOs;
-using Microsoft.AspNetCore.Identity.Data;
+using LibraryAPI.DTOs;
 
 namespace LibraryAPI.Service.Interface
 {
     public interface IAutherService
     {
-        Task<UserResponse> LoginAsync(DTOs.LoginRequest request);
-        Task<bool> RegisterAsync(DTOs.RegisterRequest request);
+      
+        Task<UserResponse?> LoginAsync(LoginRequest request);
+        Task<bool> RegisterAsync(RegisterRequest request);
     }
 }

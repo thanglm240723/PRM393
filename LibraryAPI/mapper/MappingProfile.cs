@@ -8,25 +8,28 @@ namespace LibraryAPI.mapper
     {
         public MappingProfile()
         {
-            // Map từ RegisterRequest sang User
+           
             CreateMap<RegisterRequest, User>()
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.Now))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.Now));
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.Now))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now));
 
-            // Map từ User sang UserResponse
             CreateMap<User, UserResponse>()
-                .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.UserId))
-                .ForMember(dest => dest.username, opt => opt.MapFrom(src => src.Username))
-                .ForMember(dest => dest.email, opt => opt.MapFrom(src => src.Email));
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.AvatarUrl))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
+                .ForMember(dest => dest.Token, opt => opt.Ignore()); 
 
-            // Map Book -> BookResponse (danh sách)
-            CreateMap<Book, BookResponse>();
+           
+            CreateMap<Book, BookResponse>()
+                .ForMember(dest => dest.TotalChapters, opt => opt.Ignore()); 
 
-            // Map Book -> BookDetailResponse (chi tiết)
-            // TotalChapters được gán thủ công trong Service vì cần query DB
+           
             CreateMap<Book, BookDetailResponse>()
-                .ForMember(dest => dest.TotalChapters, opt => opt.Ignore());
+                .ForMember(dest => dest.TotalChapters, opt => opt.Ignore()); 
         }
     }
 }

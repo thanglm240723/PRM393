@@ -1,11 +1,8 @@
 ﻿using LibraryAPI.DTOs;
-using LibraryAPI.Data;
-
+using LibraryAPI.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using LibraryAPI.Service.Interface;
 
 namespace LibraryAPI.Controllers
 {
@@ -15,34 +12,32 @@ namespace LibraryAPI.Controllers
     public class ReadingProgressController : ControllerBase
     {
         private readonly IReadingProgressService _progressService;
-        private readonly PersonalLibraryContext _context;
+        private readonly IGamificationService _gamification;
 
         public ReadingProgressController(
             IReadingProgressService progressService,
-            PersonalLibraryContext context)
+            IGamificationService gamification)
         {
             _progressService = progressService;
-            _context = context;
+            _gamification = gamification;
         }
 
-        // ── Lấy tiến trình đọc theo bookId ──────────────────────────
+        // GET api/ReadingProgress/{bookId}
         [HttpGet("{bookId}")]
         public async Task<IActionResult> GetProgress(int bookId)
         {
-            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userIdStr == null) return Unauthorized();
-            var userId = int.Parse(userIdStr);
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
 
-            var result = await _progressService.GetProgressAsync(userId, bookId);
+            var result = await _progressService.GetProgressAsync(userId.Value, bookId);
 
             if (result == null)
             {
-                // Chưa có tiến trình → trả về mặc định
                 return Ok(new
                 {
                     currentChapter = 1,
                     hasProgress = false,
-                    progressPercentage = 0.0
+                    progressPercentage = 0.0,
                 });
             }
 
@@ -50,35 +45,53 @@ namespace LibraryAPI.Controllers
             {
                 currentChapter = result.CurrentChapter,
                 hasProgress = true,
-                progressPercentage = result.ProgressPercentage
+                progressPercentage = result.ProgressPercentage,
             });
         }
 
-        // ── Lưu tiến trình đọc ──────────────────────────────────────
+        // POST api/ReadingProgress
+        // Response bây giờ bao gồm GamificationResult để Flutter show popup
         [HttpPost]
         public async Task<IActionResult> SaveProgress([FromBody] SaveProgressRequest dto)
         {
-            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userIdStr == null) return Unauthorized();
-            var userId = int.Parse(userIdStr);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var totalChapters = await _context.BookContents
-                .CountAsync(c => c.BookId == dto.BookId);
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
 
-            var result = await _progressService.SaveProgressAsync(userId, dto, totalChapters);
-            return Ok(result);
+            var progress = await _progressService.SaveProgressAsync(userId.Value, dto);
+
+            // GamificationResult đã được tính bên trong SaveProgressAsync
+            // Lấy lại để trả về cho Flutter
+            var gamResult = await _gamification.ProcessReadingProgressAsync(
+                userId: userId.Value,
+                bookId: dto.BookId,
+                progressPercentage: progress.ProgressPercentage ?? 0,
+                bookGenre: null, // đã xử lý trong service
+                bookPageCount: null);
+
+            return Ok(new
+            {
+                progress = progress,
+                gamification = gamResult,
+            });
         }
 
-        // ── Lấy tất cả tiến trình của user ──────────────────────────
+        // GET api/ReadingProgress
         [HttpGet]
         public async Task<IActionResult> GetAllProgress()
         {
-            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userIdStr == null) return Unauthorized();
-            var userId = int.Parse(userIdStr);
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
 
-            var result = await _progressService.GetAllProgressAsync(userId);
+            var result = await _progressService.GetAllProgressAsync(userId.Value);
             return Ok(result);
+        }
+
+        private int? GetUserId()
+        {
+            var str = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(str, out var id) ? id : null;
         }
     }
 }

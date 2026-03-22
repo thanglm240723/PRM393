@@ -10,28 +10,35 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Đăng ký DbContext (Kết nối SQL)
+
 builder.Services.AddDbContext<PersonalLibraryContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 2. Đăng ký Service của bạn
+
 builder.Services.AddScoped<IAutherService, AutherService>();
 builder.Services.AddScoped<IBookService, BookService>();
-builder.Services.AddScoped<IReadingProgressService, ReadingProgressService>(); 
-
+builder.Services.AddScoped<IGamificationService, GamificationService>();
+builder.Services.AddScoped<IReadingProgressService, ReadingProgressService>();
+builder.Services.AddScoped<IAdminBookService, AdminBookService>();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IAutherService, AutherService>();
+builder.Services.AddScoped<IUserLibraryService, UserLibraryService>();
+builder.Services.AddScoped<IAdminBookService, AdminBookService>();
+builder.Services.AddScoped<IUserLibraryService, UserLibraryService>();
+builder.Services.AddScoped<IQuoteService,       QuoteService>();
+builder.Services.AddScoped<IBookRatingService,  BookRatingService>();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
         builder =>
         {
-            builder.AllowAnyOrigin()   // Cho phép tất cả nguồn (Flutter Web, Mobile...)
-                   .AllowAnyMethod()   // Cho phép GET, POST, PUT, DELETE...
-                   .AllowAnyHeader();  // Cho phép mọi Header
+            builder.AllowAnyOrigin()   
+                   .AllowAnyMethod()   
+                   .AllowAnyHeader();  
         });
 });
 
-// 3. Cấu hình Authentication & JWT
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -53,19 +60,18 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddControllers();
 
-// Đăng ký AutoMapper (quét toàn bộ project để tìm các class kế thừa Profile)
+
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 builder.Services.AddEndpointsApiExplorer();
 
-// Cấu hình Swagger để test JWT dễ dàng hơn (Optional nhưng nên có)
 builder.Services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Name = "Authorization",
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,   // ⚠ Đổi sang Http
-        Scheme = "bearer",                                         // ⚠ phải là lowercase
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,   
+        Scheme = "bearer",                                         
         BearerFormat = "JWT",
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
         Description = "Nhập token"
@@ -96,7 +102,7 @@ using (var scope = app.Services.CreateScope())
     await DatabaseSeeder.SeedAsync(context, config);
 }
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

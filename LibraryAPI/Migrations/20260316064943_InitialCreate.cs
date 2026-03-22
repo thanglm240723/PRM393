@@ -12,6 +12,24 @@ namespace LibraryAPI.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Badges",
+                columns: table => new
+                {
+                    BadgeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Icon = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false, defaultValue: "🏅"),
+                    ConditionType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Threshold = table.Column<int>(type: "int", nullable: false),
+                    DisplayOrder = table.Column<int>(type: "int", nullable: false, defaultValue: 0)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Badges", x => x.BadgeId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Books",
                 columns: table => new
                 {
@@ -45,7 +63,7 @@ namespace LibraryAPI.Migrations
                     PasswordHash = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     AvatarUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false, defaultValue: "user"),
                     CreatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())"),
                     UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())")
                 },
@@ -79,6 +97,44 @@ namespace LibraryAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BookRatings",
+                columns: table => new
+                {
+                    RatingId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    BookId = table.Column<int>(type: "int", nullable: false),
+                    Stars = table.Column<int>(type: "int", nullable: false),
+                    Review = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
+                    IsVerifiedReader = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "(getdate())"),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true),
+                    BookId1 = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookRatings", x => x.RatingId);
+                    table.CheckConstraint("CK_BookRating_Stars", "[Stars] >= 1 AND [Stars] <= 5");
+                    table.ForeignKey(
+                        name: "FK_BookRatings_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "BookId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BookRatings_Books_BookId1",
+                        column: x => x.BookId1,
+                        principalTable: "Books",
+                        principalColumn: "BookId");
+                    table.ForeignKey(
+                        name: "FK_BookRatings_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ReadingHistory",
                 columns: table => new
                 {
@@ -107,6 +163,33 @@ namespace LibraryAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserBadges",
+                columns: table => new
+                {
+                    UserBadgeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    BadgeId = table.Column<int>(type: "int", nullable: false),
+                    EarnedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "(getdate())")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserBadges", x => x.UserBadgeId);
+                    table.ForeignKey(
+                        name: "FK_UserBadges_Badges_BadgeId",
+                        column: x => x.BadgeId,
+                        principalTable: "Badges",
+                        principalColumn: "BadgeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserBadges_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserLibrary",
                 columns: table => new
                 {
@@ -116,7 +199,9 @@ namespace LibraryAPI.Migrations
                     BookId = table.Column<int>(type: "int", nullable: true),
                     AddedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())"),
                     IsFavorite = table.Column<bool>(type: "bit", nullable: true, defaultValue: false),
-                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true, defaultValue: "Want to Read")
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true, defaultValue: "Want to Read"),
+                    CompletedAt = table.Column<DateTime>(type: "datetime", nullable: true),
+                    IsCountedAsRead = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
@@ -129,6 +214,36 @@ namespace LibraryAPI.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK__UserLibra__UserI__46E78A0C",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserStats",
+                columns: table => new
+                {
+                    UserStatsId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    TotalBooksRead = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    TotalBooksStarted = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    TotalPagesRead = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    TotalMinutesRead = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    TotalWordsRead = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    CurrentStreak = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    LongestStreak = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    LastReadDate = table.Column<DateTime>(type: "date", nullable: true),
+                    FavoriteGenre = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Rank = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, defaultValue: "Mầm Đọc"),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "(getdate())")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserStats", x => x.UserStatsId);
+                    table.ForeignKey(
+                        name: "FK_UserStats_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
@@ -210,6 +325,44 @@ namespace LibraryAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Quotes",
+                columns: table => new
+                {
+                    QuoteId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    BookId = table.Column<int>(type: "int", nullable: false),
+                    ContentId = table.Column<int>(type: "int", nullable: true),
+                    QuoteText = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PersonalNote = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    StartPosition = table.Column<int>(type: "int", nullable: true),
+                    EndPosition = table.Column<int>(type: "int", nullable: true),
+                    IsPublic = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "(getdate())")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Quotes", x => x.QuoteId);
+                    table.ForeignKey(
+                        name: "FK_Quotes_BookContents_ContentId",
+                        column: x => x.ContentId,
+                        principalTable: "BookContents",
+                        principalColumn: "ContentId",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Quotes_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "BookId");
+                    table.ForeignKey(
+                        name: "FK_Quotes_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ReadingProgress",
                 columns: table => new
                 {
@@ -266,6 +419,22 @@ namespace LibraryAPI.Migrations
                 columns: new[] { "UserId", "BookId" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_BookRatings_BookId",
+                table: "BookRatings",
+                column: "BookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BookRatings_BookId1",
+                table: "BookRatings",
+                column: "BookId1");
+
+            migrationBuilder.CreateIndex(
+                name: "UQ_BookRating_UserId_BookId",
+                table: "BookRatings",
+                columns: new[] { "UserId", "BookId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Highlights_BookId",
                 table: "Highlights",
                 column: "BookId");
@@ -278,6 +447,26 @@ namespace LibraryAPI.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Highlights_UserId_BookId",
                 table: "Highlights",
+                columns: new[] { "UserId", "BookId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Quotes_BookId",
+                table: "Quotes",
+                column: "BookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Quotes_ContentId",
+                table: "Quotes",
+                column: "ContentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Quotes_IsPublic",
+                table: "Quotes",
+                column: "IsPublic");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Quotes_UserId_BookId",
+                table: "Quotes",
                 columns: new[] { "UserId", "BookId" });
 
             migrationBuilder.CreateIndex(
@@ -313,6 +502,17 @@ namespace LibraryAPI.Migrations
                 filter: "[UserId] IS NOT NULL AND [BookId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserBadges_BadgeId",
+                table: "UserBadges",
+                column: "BadgeId");
+
+            migrationBuilder.CreateIndex(
+                name: "UQ_UserBadge_UserId_BadgeId",
+                table: "UserBadges",
+                columns: new[] { "UserId", "BadgeId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserLibrary_BookId",
                 table: "UserLibrary",
                 column: "BookId");
@@ -340,6 +540,12 @@ namespace LibraryAPI.Migrations
                 table: "Users",
                 column: "Email",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "UQ_UserStats_UserId",
+                table: "UserStats",
+                column: "UserId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -349,7 +555,13 @@ namespace LibraryAPI.Migrations
                 name: "Bookmarks");
 
             migrationBuilder.DropTable(
+                name: "BookRatings");
+
+            migrationBuilder.DropTable(
                 name: "Highlights");
+
+            migrationBuilder.DropTable(
+                name: "Quotes");
 
             migrationBuilder.DropTable(
                 name: "ReadingHistory");
@@ -358,10 +570,19 @@ namespace LibraryAPI.Migrations
                 name: "ReadingProgress");
 
             migrationBuilder.DropTable(
+                name: "UserBadges");
+
+            migrationBuilder.DropTable(
                 name: "UserLibrary");
 
             migrationBuilder.DropTable(
+                name: "UserStats");
+
+            migrationBuilder.DropTable(
                 name: "BookContents");
+
+            migrationBuilder.DropTable(
+                name: "Badges");
 
             migrationBuilder.DropTable(
                 name: "Users");
